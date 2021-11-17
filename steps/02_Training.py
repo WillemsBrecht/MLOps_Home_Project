@@ -25,6 +25,7 @@ def prepareMachines(ws):
     compute_min_nodes = int(os.environ.get("AML_COMPUTE_CLUSTER_MIN_NODES"))
     compute_max_nodes = int(os.environ.get("AML_COMPUTE_CLUSTER_MAX_NODES"))
     vm_size = os.environ.get("AML_COMPUTE_CLUSTER_SKU")
+    show_progress_training = os.environ.get('SHOW_PROGRESS_TRAINING') == 'true'
 
     if compute_name in ws.compute_targets:
         compute_target = ws.compute_targets[compute_name]
@@ -34,14 +35,17 @@ def prepareMachines(ws):
         print("creating new compute target...")
         provisioning_config = AmlCompute.provisioning_configuration(vm_size = vm_size, min_nodes = compute_min_nodes, max_nodes = compute_max_nodes)
         compute_target = ComputeTarget.create(ws, compute_name, provisioning_config)
-        compute_target.wait_for_completion(show_output=True, min_node_count=None, timeout_in_minutes=20)
+        compute_target.wait_for_completion(show_output=show_progress_training, min_node_count=None, timeout_in_minutes=20)
     return compute_target
 
 
 def prepareEnv(ws, env_name):
     # Create environment
     env = Environment(env_name)
-    cd = CondaDependencies.create(pip_packages=['azureml-dataset-runtime[pandas,fuse]', 'azureml-defaults', 'scikit-learn', 'tensorflow'],)
+    cd = CondaDependencies.create(  pip_packages=[  'azureml-dataset-runtime[pandas,fuse]', 'azureml-defaults', 'azure-ml-api-sdk', 
+                                                    'opencv-python', 'onnxmltools', 'onnxruntime', 'tf2onnx'], 
+                                    conda_packages = ['scikit-learn==0.22.1', 'tensorflow']
+                                    )
     env.python.conda_dependencies = cd
 
     # Register environment to re-use later
@@ -51,12 +55,27 @@ def prepareEnv(ws, env_name):
 
 def prepareTraining(dataset, script_folder, compute_target, env):
     # get environment variables
-    reg_parameter = float(os.environ.get('REG_PARAMETER'))
-    train_Script_name = os.environ.get('TRAIN_SCRIPT_NAME')
+    parameter_name = os.environ.get('MODEL_NAME')
+    parameter_version = float(os.environ.get('MODEL_VERSION'))
+    parameter_epochs = int(os.environ.get('MODEL_EPOCHS'))
+    parameter_batchsize = int(os.environ.get('MODEL_BATCH_SIZE'))
+    parameter_dataset_name = os.environ.get('DATASET_NAME')
+
+    train_script_name = os.environ.get('TRAIN_SCRIPT_NAME')
 
     # define arguments and training script
-    args = ['--data-folder', dataset.as_mount(), '--regularization', reg_parameter]
-    src = ScriptRunConfig(source_directory=script_folder, script=train_Script_name, arguments=args,  compute_target=compute_target, environment=env)
+    args = ['--data-folder', dataset.as_mount(), 
+            '--modelname', parameter_name,
+            '--modelversion', parameter_version,
+            '--epochs', parameter_epochs,
+            '--batchsize', parameter_batchsize,
+            '--dataset_name', parameter_dataset_name
+            ]
+    src = ScriptRunConfig(  source_directory=script_folder, 
+                            script=train_script_name, 
+                            arguments=args,  
+                            compute_target=compute_target, 
+                            environment=env)
 
     return src
 

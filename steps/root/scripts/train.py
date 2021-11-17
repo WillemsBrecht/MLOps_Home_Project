@@ -1,49 +1,111 @@
+
 import argparse
 import os
 import numpy as np
 import glob
-
-from sklearn.linear_model import LogisticRegression
+import cv2 
+import random
 import joblib
+import pandas as pd
+os.environ["KERAS_BACKEND"] = "tensorflow"
+import tensorflow as tf
+import onnxmltools
+import tf2onnx
+from sklearn.model_selection import train_test_split
 
-from azureml.core import Run
-from utils import load_data
+from tensorflow.keras import layers, losses
+from tensorflow.keras.models import Model
+from tensorflow.keras import backend as K
 
-# let user feed in 2 parameters, the dataset to mount or download, and the regularization rate of the logistic regression model
+from azureml.core import Workspace, Dataset, Run
+
+# arguments - given during training step 02
 parser = argparse.ArgumentParser()
-parser.add_argument('--data-folder', type=str, dest='data_folder', help='data folder mounting point')
-parser.add_argument('--regularization', type=float, dest='reg', default=0.01, help='regularization rate')
+parser.add_argument('--modelname', type=str, dest='modelname', default="model1")
+parser.add_argument('--modelversion', type=float, dest='modelversion', default=0.1)
+parser.add_argument('--epochs', type=int, dest='epochs', default=20)
+parser.add_argument('--batchsize', type=int, dest='batchsize', default=64)
+parser.add_argument('--dataset_name', type=str, dest='dataset_name', default='lungs')
 args = parser.parse_args()
 
-data_folder = args.data_folder
-print('Data folder:', data_folder)
+# data inlezen
+dataset_folder = os.path.join(os.getcwd(), 'dataset')
+os.makedirs(dataset_folder, exist_ok=True)
 
-# load train and test set into numpy arrays
-# note we scale the pixel intensity values to 0-1 (by dividing it with 255.0) so the model can converge faster.
-X_train = load_data(glob.glob(os.path.join(data_folder, '**/train-images-idx3-ubyte.gz'), recursive=True)[0], False) / 255.0
-X_test = load_data(glob.glob(os.path.join(data_folder, '**/t10k-images-idx3-ubyte.gz'), recursive=True)[0], False) / 255.0
-y_train = load_data(glob.glob(os.path.join(data_folder, '**/train-labels-idx1-ubyte.gz'), recursive=True)[0], True).reshape(-1)
-y_test = load_data(glob.glob(os.path.join(data_folder, '**/t10k-labels-idx1-ubyte.gz'), recursive=True)[0], True).reshape(-1)
+run = Run.get_context()
+workspace = run.experiment.workspace
+
+dataset = Dataset.get_by_name(workspace, name=args.dataset_name)
+dataset.download(target_path=dataset_folder, overwrite=True)
+
+# reading images
+Lung_images_path = glob.glob('./dataset/Lung_images/*.png') 
+Lung_masks_path = glob.glob('./dataset/Lung_masks/*.png*') 
+
+def read_images(path):
+    images = []
+    for f in path: 
+        img = cv2.imread(f) 
+        im_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        resize = cv2.resize(im_rgb, (400,400))
+        images.append(resize) 
+    return images
+
+X = np.array(read_images(Lung_images_path)) # images
+y = np.array(read_images(Lung_masks_path)) # masks
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=20, random_state=42)
 
 print(X_train.shape, y_train.shape, X_test.shape, y_test.shape, sep = '\n')
 
-# get hold of the current run
-run = Run.get_context()
+# normalisatie van de pixel waarden
+X_train = X_train.astype('float32') / 255
+X_test = X_test.astype('float32') / 255
+y_train = y_train.astype('float32') / 255
+y_test = y_test.astype('float32') / 255
 
-print('Train a logistic regression model with regularization rate of', args.reg)
-clf = LogisticRegression(C=1.0/args.reg, solver="liblinear", multi_class="auto", random_state=42)
-clf.fit(X_train, y_train)
+# Creating autoencoder model
+latent_dim = 64 
 
-print('Predict the test set')
-y_hat = clf.predict(X_test)
+class Autoencoder(Model):
+  def __init__(self, latent_dim):
+    super(Autoencoder, self).__init__()
+    self.latent_dim = latent_dim   
+    self.encoder = tf.keras.Sequential([
+      layers.Flatten(),
+      layers.Dense(latent_dim, activation='relu'),
+    ])
+    self.decoder = tf.keras.Sequential([
+      layers.Dense(400*400, activation='sigmoid'),
+      layers.Reshape((400, 400))
+    ])
 
-# calculate accuracy on the prediction
-acc = np.average(y_hat == y_test)
-print('Accuracy is', acc)
+  def call(self, x):
+    encoded = self.encoder(x)
+    decoded = self.decoder(encoded)
+    return decoded
 
-run.log('regularization rate', np.float(args.reg))
-run.log('accuracy', np.float(acc))
+  def dice_coef(self, y_true, y_pred, smooth=1):
+    intersection = K.sum(K.abs(y_true * y_pred), axis=-1)
+    return (2.*intersection + smooth)/(K.sum(K.square(y_true),-1)+ K.sum(K.square(y_pred),-1) + smooth)
+
+  def dice_coef_loss(self, y_true, y_pred):
+    return 1-self.dice_coef(y_true, y_pred)
+
+autoencoder = Autoencoder(latent_dim)
+
+autoencoder.compile(optimizer='adam', loss=autoencoder.dice_coef_loss)
+history = autoencoder.fit(X_train, y_train, epochs=args.epochs, batch_size=args.batchsize, shuffle=True)
+
+print("Train an autoencoder with batchsize {}; epochs: {}".format(args.batchsize, args.epochs))
+
+# Showing loss
+print("loss training: {}".format(history.history['loss']))
+
+# adding logs
+run.log('batch size', np.int(args.batchsize))
+run.log('epochs', np.int(args.epochs))
 
 os.makedirs('outputs', exist_ok=True)
-# note file saved in the outputs folder is automatically uploaded into experiment record
-joblib.dump(value=clf, filename='outputs/sklearn_mnist_model.pkl')
+onnx_model = onnxmltools.convert_keras(autoencoder) 
+onnxmltools.utils.save_model(onnx_model, 'outputs/keras_example.onnx')
