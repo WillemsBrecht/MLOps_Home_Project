@@ -29,10 +29,11 @@ def uploadData(data_folder, ws, datastore): # download our data
     dataset_name = os.environ.get('DATASET_NAME') #name of dataset
     dataset_description = os.environ.get('DATASET_DESCRIPTION')  #desc of dataset
     dataset_new_version = os.environ.get('DATASET_NEW_VERSION') == 'true'
+    show_progress_dataprep = os.environ.get('DATASET_NEW_VERSION') == 'true'
 
     # upload dataset to workspace
     ds_target = DataPath(datastore, dataset_name)
-    dataset_obj = Dataset.File.upload_directory(src_dir=data_folder, target=ds_target, show_progress=True, overwrite=True)
+    dataset_obj = Dataset.File.upload_directory(src_dir=data_folder, target=ds_target, show_progress=show_progress_dataprep, overwrite=False)
     dataset_obj = dataset_obj.register(workspace=ws, name=dataset_name, description=dataset_description, create_new_version=dataset_new_version)
 
     #return dataset variables

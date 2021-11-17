@@ -18,19 +18,6 @@ from azureml.core import Run, Experiment, Workspace, Dataset, Datastore
 load_dotenv()
 
 
-def prepareEnv(ws, env_name):
-    env = Environment(env_name)
-    cd = CondaDependencies.create(
-        pip_packages=['azureml-dataset-runtime[pandas,fuse]', 'azureml-defaults', 'scikit-learn', 'tensorflow'],
-        )
-
-    env.python.conda_dependencies = cd
-
-    # Register environment to re-use later
-    env.register(workspace = ws)
-
-    return env
-
 def prepareMachines(ws):
     ## If machine not yet ready, create !
     # choose a name for your cluster
@@ -50,16 +37,26 @@ def prepareMachines(ws):
         compute_target.wait_for_completion(show_output=True, min_node_count=None, timeout_in_minutes=20)
     return compute_target
 
+
+def prepareEnv(ws, env_name):
+    # Create environment
+    env = Environment(env_name)
+    cd = CondaDependencies.create(pip_packages=['azureml-dataset-runtime[pandas,fuse]', 'azureml-defaults', 'scikit-learn', 'tensorflow'],)
+    env.python.conda_dependencies = cd
+
+    # Register environment to re-use later
+    env.register(workspace = ws)
+    return env
+
+
 def prepareTraining(dataset, script_folder, compute_target, env):
     # get environment variables
     reg_parameter = float(os.environ.get('REG_PARAMETER'))
     train_Script_name = os.environ.get('TRAIN_SCRIPT_NAME')
 
     # define arguments and training script
-    args = ['--data-folder', dataset.as_mount(), '--regularization', 0.5]
-    src = ScriptRunConfig(source_directory=script_folder, 
-                            script='train.py', arguments=args, 
-                            compute_target=compute_target, environment=env)
+    args = ['--data-folder', dataset.as_mount(), '--regularization', reg_parameter]
+    src = ScriptRunConfig(source_directory=script_folder, script=train_Script_name, arguments=args,  compute_target=compute_target, environment=env)
 
     return src
 
@@ -78,12 +75,12 @@ def main():
     temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
 
     env_name = os.environ.get("AML_ENV_NAME")
-    model_name = os.environ.get("MODEL_NAME")
+    #model_name = os.environ.get("MODEL_NAME")
     dataset_name = os.environ.get('DATASET_NAME')
 
     root_dir = os.environ.get('ROOT_DIR')
     script_folder = os.path.join(root_dir, 'scripts')
-    config_state_folder = os.path.join(root_dir, 'config_states')
+    #config_state_folder = os.path.join(root_dir, 'config_states')
 
     # setup workspace + datastore
     ws = Workspace.get(
@@ -96,7 +93,6 @@ def main():
 
     # Prepare!
     dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
-    
     compute_target = prepareMachines(ws)
     env = prepareEnv(ws, env_name)
     src = prepareTraining(dataset, script_folder, compute_target, env)
@@ -106,7 +102,6 @@ def main():
     run = exp.submit(config=src)
 
     run.wait_for_completion()
-
     run_details = {k:v for k,v in run.get_details().items() if k not in ['inputDatasets', 'outputDatasets']}
     
     path_json = os.path.join(temp_state_directory, 'training_run.json')
