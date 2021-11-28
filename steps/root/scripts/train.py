@@ -29,9 +29,11 @@ parser.add_argument('--dataset_name', type=str, dest='dataset_name', default='lu
 args = parser.parse_args()
 
 # data inlezen
-dataset_folder = os.path.join(os.getcwd(), 'dataset')
+dataset_folder = os.path.join(os.getcwd(), "dataset")
 os.makedirs(dataset_folder, exist_ok=True)
+print('Data folder:', dataset_folder)
 
+# get hold of the current run
 run = Run.get_context()
 workspace = run.experiment.workspace
 

@@ -16,14 +16,11 @@ def getConfiguration(details_file):
             config = json.load(f)
     except Exception as e:
         sys.exit(0)
-
     return config
 
 def registerModel(model_name, description, run):
-
-    model = run.register_model(model_name=model_name, model_path=f'outputs/{model_name}', tags={"runId": run.id}, description=description)
+    model = run.register_model(model_name=model_name, model_path='outputs/keras_example.onnx', tags={"runId": run.id}, description=description)
     print("Model registered: {} \nModel Description: {} \nModel Version: {}".format(model.name, model.description, model.version))
-
     return model
 
 def main():
