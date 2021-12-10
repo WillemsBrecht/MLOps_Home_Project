@@ -110,4 +110,4 @@ run.log('epochs', np.int(args.epochs))
 
 os.makedirs('outputs', exist_ok=True)
 onnx_model = onnxmltools.convert_keras(autoencoder) 
-onnxmltools.utils.save_model(onnx_model, 'outputs/keras_example.onnx')
+onnxmltools.utils.save_model(onnx_model, f'outputs/{args.modelname}.onnx')

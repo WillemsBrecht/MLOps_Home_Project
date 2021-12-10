@@ -26,6 +26,16 @@ def getConfiguration(details_file):
 
     return config
 
+def downloadModel(run, name_model='model.pt', model_extension='.pt', azure_path='outputs', download_path='modelDownloads'):
+    #create model folder
+    os.makedirs(f'./{download_path}', exist_ok=True) 
+    #download model from run history/outputs
+    m = f'{name_model}{model_extension}'
+    model_path_azure = f'{azure_path}/{m}'
+    model_path_local = f'./{download_path}/{m}'
+    run.download_file(name=model_path_azure, output_file_path=model_path_local)
+    print(f'Downloaded model {m} from {model_path_azure} on Azure to local {model_path_local}')
+
 def main():
     print('Executing main - 04_DeployModel')
 
@@ -37,8 +47,15 @@ def main():
     resource_group = os.environ.get("RESOURCE_GROUP")
     subscription_id = os.environ.get("SUBSCRIPTION_ID")
 
-    environment = os.environ.get("AML_ENV_NAME")
-    score_script_path = os.path.join(os.environ.get("ROOT_DIR"), 'scripts', 'score.py')
+    experiment_name = os.environ.get("EXPERIMENT_NAME")
+
+    model_name = os.environ.get("MODEL_NAME")
+    model_extension = os.environ.get("MODEL_EXTENSION")
+    azure_path = os.environ.get("AZURE_OUTPUT")
+    download_path = os.environ.get("MODEL_FOLDER")
+
+    #environment = os.environ.get("AML_ENV_NAME")
+    #score_script_path = os.path.join(os.environ.get("ROOT_DIR"), 'scripts', 'score.py')
     temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
 
     # setup workspace + datastore
@@ -49,45 +66,17 @@ def main():
         auth=cli_auth
     )
 
-    #
-    path_json = os.path.join(temp_state_directory, 'model_details.json')
+    # get run
+    path_json = os.path.join(temp_state_directory, 'training_run.json')
     config = getConfiguration(path_json)
+    exp = Experiment(workspace=ws, name=experiment_name)
+    run = Run(experiment=exp, run_id=config['runId'])
 
-    model = Model.deserialize(workspace=ws, model_payload=config['model'])
-    
-    env = Environment(environment + '-deployment')
-    cd = CondaDependencies.create(
-        pip_packages=['azureml-defaults','numpy', 'tensorflow']
-    )
-
-    env.python.conda_dependencies = cd
-    env.register(workspace = ws)
-    inference_config = InferenceConfig(entry_script=score_script_path, environment=env)
-
-    # Azure Container Instance
-    aciconfig = AciWebservice.deploy_configuration(
-        cpu_cores=1, 
-        memory_gb=1, 
-        tags={"data": "mnist",  "method" : "keras"}, 
-        description='Classify handwritten digits'
-    )
-
-    service_name = 'mnist-digits-svc-' + str(uuid.uuid4())[:4]
-    service = Model.deploy(workspace=ws, 
-                        name=service_name, 
-                        models=[model], 
-                        inference_config=inference_config, 
-                        deployment_config=aciconfig)
-
-    service.wait_for_deployment(show_output=True)
-
-    # save
-    path_json = os.path.join(temp_state_directory, 'service_details.json')
-    with open(path_json, "w") as service_details:
-        json.dump(service.serialize(), service_details)
+    # download model to
+    downloadModel(run, model_name, model_extension, azure_path, download_path)
     
     # Finish
-    print('Executing main - 03_RegisterModel - SUCCES')
+    print('Executing main - 04_DeployModel - SUCCES')
     
     
 
