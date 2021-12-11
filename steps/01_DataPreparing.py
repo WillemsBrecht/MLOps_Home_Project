@@ -47,7 +47,7 @@ def main():
 
     # get environment variables
     env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
-    env = json.load(env)
+    env = json.loads(env)
 
     resource_group = env.get("RESOURCE_GROUP") # Azure Resource grouo
     subscription_id = env.get("SUBSCRIPTION_ID") # Azure Subscription ID
