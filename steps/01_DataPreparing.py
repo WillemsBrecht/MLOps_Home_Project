@@ -46,6 +46,10 @@ def main():
     cli_auth = AzureCliAuthentication()
 
     # get environment variables
+    super_secret = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
+    print(f'{super_secret}')
+
+
     resource_group = os.environ.get("RESOURCE_GROUP") # Azure Resource grouo
     subscription_id = os.environ.get("SUBSCRIPTION_ID") # Azure Subscription ID
     workspace_name = os.environ.get("WORKSPACE_NAME") # ML Service Workspace of resource group
