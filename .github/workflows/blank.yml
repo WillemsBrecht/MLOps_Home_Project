@@ -25,18 +25,35 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: 'Set up python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: 'Run data prep script'
+        working-directory: steps
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-          echo I put the coconut in the bag
+          python steps/01_DataPreparing.py
+          
+      - name: 'Run Training script'
+        working-directory: steps
+        run: |
+          python steps/02_Training.py
+          
+      - name: 'Register model'
+        working-directory: steps
+        run: |
+          python steps/03_RegisterModel.py
+          
+      - name: 'Deploy model'
+        working-directory: steps
+        run: |
+          python steps/04_DeployModel.py
+      
+      - name: "Save config data"
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: config-data
+          path: tmp
+          retention-days: 10
 
-      # Runs a set of commands using the runners shell
-      - name: Test if python works
-        run: |
-          python3 steps/00_TestPython.py
