@@ -110,6 +110,7 @@ def main():
     script_folder = os.path.join(root_dir, 'scripts')
 
     # setup workspace + datastore
+    print(f'Connect to workspace {workspace_name} for experiment {experiment_name}')
     ws = Workspace.get(
         name=workspace_name,
         subscription_id=subscription_id,
