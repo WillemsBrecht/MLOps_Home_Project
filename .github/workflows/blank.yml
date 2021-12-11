@@ -25,10 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: 'Show working directory'
-        run: |
-          pwd
-
       - name: 'Run data prep script'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
