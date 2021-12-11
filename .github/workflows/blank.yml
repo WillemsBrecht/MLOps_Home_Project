@@ -60,7 +60,7 @@ jobs:
         working-directory: api/api
         run: |
           mkdir images
-          ll
+          ls
 
       # Build and run Dockerfile
       - name: Set PAT secret
