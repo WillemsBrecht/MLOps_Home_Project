@@ -64,7 +64,7 @@ def prepareEnv(ws, env_name):
     return env
 
 
-def prepareTraining(env, dataset, script_folder, compute_target, env):
+def prepareTraining(env, dataset, script_folder, compute_target, environment):
     # get environment variables
     parameter_name = env.get('MODEL_NAME')
     parameter_version = float(env.get('MODEL_VERSION'))
@@ -85,7 +85,7 @@ def prepareTraining(env, dataset, script_folder, compute_target, env):
                             script=train_script_name, 
                             arguments=args,  
                             compute_target=compute_target, 
-                            environment=env)
+                            environment=environment)
 
     return src
 
@@ -126,8 +126,8 @@ def main():
     print(dataset_name)
     dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
     compute_target = prepareMachines(env, ws)
-    env = prepareEnv(ws, env_name)
-    src = prepareTraining(env, dataset, script_folder, compute_target, env)
+    environment = prepareEnv(ws, env_name)
+    src = prepareTraining(env, dataset, script_folder, compute_target, environment)
 
     ## Start training
     exp = Experiment(workspace=ws, name=experiment_name)
