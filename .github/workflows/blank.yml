@@ -33,25 +33,25 @@ jobs:
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          python steps/01_DataPreparing.py
+          python3 steps/01_DataPreparing.py
           
       - name: 'Run Training script'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          python  steps/02_Training.py
+          python3  steps/02_Training.py
           
       - name: 'Register model'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          python  steps/03_RegisterModel.py
+          python3  steps/03_RegisterModel.py
           
       - name: 'Deploy model'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          python steps/04_DeployModel.py
+          python3 steps/04_DeployModel.py
       
       - name: "Save config data"
         uses: actions/upload-artifact@v2.2.3
