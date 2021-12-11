@@ -34,11 +34,6 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: "Azure login"  
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: 'Run data prep script'
         run: |
           python steps/01_DataPreparing.py
