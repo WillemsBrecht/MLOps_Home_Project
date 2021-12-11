@@ -25,25 +25,35 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: 'Run data prep script'
-        working-directory: steps
+      - name: 'Show working directory'
         run: |
-          python3 01_DataPreparing.py
+          pwd
+
+      - name: 'Set up python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: "Azure login"  
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Run data prep script'
+        run: |
+          python steps/01_DataPreparing.py
           
       - name: 'Run Training script'
-        working-directory: steps
         run: |
-          python3 02_Training.py
+          python  steps/02_Training.py
           
       - name: 'Register model'
-        working-directory: steps
         run: |
-          python3 03_RegisterModel.py
+          python  steps/03_RegisterModel.py
           
       - name: 'Deploy model'
-        working-directory: steps
         run: |
-          python3 04_DeployModel.py
+          python steps/04_DeployModel.py
       
       - name: "Save config data"
         uses: actions/upload-artifact@v2.2.3
