@@ -24,12 +24,12 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 load_dotenv()
 
 
-def uploadData(data_folder, ws, datastore): # download our data
+def uploadData(env, data_folder, ws, datastore): # download our data
     # get environment variables
-    dataset_name = os.environ.get('DATASET_NAME') #name of dataset
-    dataset_description = os.environ.get('DATASET_DESCRIPTION')  #desc of dataset
-    dataset_new_version = os.environ.get('DATASET_NEW_VERSION') == 'true'
-    show_progress_dataprep = os.environ.get('SHOW_PROGRESS_DATAPREP') == 'true'
+    dataset_name = env.get('DATASET_NAME') #name of dataset
+    dataset_description = env.get('DATASET_DESCRIPTION')  #desc of dataset
+    dataset_new_version = env.get('DATASET_NEW_VERSION') == 'true'
+    show_progress_dataprep = env.get('SHOW_PROGRESS_DATAPREP') == 'true'
 
     # upload dataset to workspace
     ds_target = DataPath(datastore, dataset_name)
@@ -46,14 +46,13 @@ def main():
     cli_auth = AzureCliAuthentication()
 
     # get environment variables
-    super_secret = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
-    print(f'{super_secret}')
+    env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
+    env = json.load(env)
 
-
-    resource_group = os.environ.get("RESOURCE_GROUP") # Azure Resource grouo
-    subscription_id = os.environ.get("SUBSCRIPTION_ID") # Azure Subscription ID
-    workspace_name = os.environ.get("WORKSPACE_NAME") # ML Service Workspace of resource group
-    temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
+    resource_group = env.get("RESOURCE_GROUP") # Azure Resource grouo
+    subscription_id = env.get("SUBSCRIPTION_ID") # Azure Subscription ID
+    workspace_name = env.get("WORKSPACE_NAME") # ML Service Workspace of resource group
+    temp_state_directory = env.get('TEMP_STATE_DIRECTORY')
 
     # setup workspace + datastore
     print(f'Connect to workspace {workspace_name}')
@@ -64,8 +63,8 @@ def main():
     datastore = Datastore(ws)
 
     # download workspace
-    data_folder = os.path.join(os.getcwd(), os.environ.get('DATA_FOLDER'))
-    data_result = uploadData(data_folder, ws, datastore)
+    data_folder = os.path.join(os.getcwd(), env.get('DATA_FOLDER'))
+    data_result = uploadData(env, data_folder, ws, datastore)
 
     # create temporary directory
     os.makedirs(temp_state_directory, exist_ok=True)
