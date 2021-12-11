@@ -60,3 +60,17 @@ jobs:
           path: tmp
           retention-days: 10
 
+      # Build and run Dockerfile
+      - name: Set PAT secret
+        run: |
+          echo ${{ secrets.PAT }} | docker login ghcr.io --username WillemsBrecht --password-stdin
+
+      - name: Build Dockerfile and push to github
+        working-directory: api/api
+        run: |
+          docker build -t ghcr.io/WillemsBrecht/lungsfastapi .
+          docker push ghcr.io/WillemsBrecht/lungsfastapi
+
+
+
+
