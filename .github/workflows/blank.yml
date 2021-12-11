@@ -68,8 +68,8 @@ jobs:
       - name: Build Dockerfile and push to github
         working-directory: api/api
         run: |
-          docker build -t ghcr.io/WillemsBrecht/lungsfastapi .
-          docker push ghcr.io/WillemsBrecht/lungsfastapi
+          docker build -t ghcr.io/willemsbrecht/lungsfastapi .
+          docker push ghcr.io/willemsbrecht/lungsfastapi
 
 
 
