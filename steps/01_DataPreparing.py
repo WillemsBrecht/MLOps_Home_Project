@@ -52,6 +52,7 @@ def main():
     temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
 
     # setup workspace + datastore
+    print(f'Connect to workspace {workspace_name}')
     ws = Workspace.get(name=workspace_name, 
                         subscription_id=subscription_id, 
                         resource_group=resource_group, 
