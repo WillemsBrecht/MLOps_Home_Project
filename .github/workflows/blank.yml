@@ -59,6 +59,12 @@ jobs:
           name: config-data
           path: tmp
           retention-days: 10
+          
+      - name: Debugging
+        working-directory: api/api
+        run: |
+          mkdir images
+          ll
 
       # Build and run Dockerfile
       - name: Set PAT secret
