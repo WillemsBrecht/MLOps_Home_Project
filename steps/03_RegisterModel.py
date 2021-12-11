@@ -16,14 +16,11 @@ def getConfiguration(details_file):
             config = json.load(f)
     except Exception as e:
         sys.exit(0)
-
     return config
 
-def registerModel(model_name, description, run):
-
-    model = run.register_model(model_name=model_name, model_path=f'outputs/{model_name}', tags={"runId": run.id}, description=description)
+def registerModel(model_name, model_extension, description, run):
+    model = run.register_model(model_name=model_name, model_path=f'outputs/{model_name}{model_extension}', tags={"runId": run.id}, description=description)
     print("Model registered: {} \nModel Description: {} \nModel Version: {}".format(model.name, model.description, model.version))
-
     return model
 
 def main():
@@ -38,6 +35,7 @@ def main():
     subscription_id = os.environ.get("SUBSCRIPTION_ID")
     
     model_name = os.environ.get("MODEL_NAME")
+    model_extension = os.environ.get("MODEL_EXTENSION")
     model_description = os.environ.get("MODEL_DESCRIPTION")
     experiment_name = os.environ.get("EXPERIMENT_NAME")
 
@@ -69,7 +67,7 @@ def main():
     #-------------------------------
 
     # register model
-    model = registerModel(model_name, model_description, run)
+    model = registerModel(model_name, model_extension, model_description, run)
     model_json = {}
     model_json["model"] = model.serialize()
     model_json["run"] = config

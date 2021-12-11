@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: "1.0"
+description: Meaningful description
+home: https://helm.sh/helm
+maintainers:
+  - email: alex.carlier@student.howest.be
+    name: Carlier Alex
+name: fastapi-lungs
+sources:
+  - https://github.com/helm/helm
+version: 1.0.0

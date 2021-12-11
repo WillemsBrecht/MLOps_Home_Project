@@ -25,7 +25,9 @@ def prepareMachines(ws):
     compute_min_nodes = int(os.environ.get("AML_COMPUTE_CLUSTER_MIN_NODES"))
     compute_max_nodes = int(os.environ.get("AML_COMPUTE_CLUSTER_MAX_NODES"))
     vm_size = os.environ.get("AML_COMPUTE_CLUSTER_SKU")
+    show_progress_training = os.environ.get('SHOW_PROGRESS_TRAINING') == 'true'
 
+    print(f'show_progress_training={show_progress_training}')
     if compute_name in ws.compute_targets:
         compute_target = ws.compute_targets[compute_name]
         if compute_target and type(compute_target) is AmlCompute:
@@ -34,14 +36,27 @@ def prepareMachines(ws):
         print("creating new compute target...")
         provisioning_config = AmlCompute.provisioning_configuration(vm_size = vm_size, min_nodes = compute_min_nodes, max_nodes = compute_max_nodes)
         compute_target = ComputeTarget.create(ws, compute_name, provisioning_config)
-        compute_target.wait_for_completion(show_output=True, min_node_count=None, timeout_in_minutes=20)
+        compute_target.wait_for_completion(show_output=show_progress_training, min_node_count=None, timeout_in_minutes=20)
     return compute_target
 
 
 def prepareEnv(ws, env_name):
     # Create environment
     env = Environment(env_name)
-    cd = CondaDependencies.create(pip_packages=['azureml-dataset-runtime[pandas,fuse]', 'azureml-defaults', 'scikit-learn', 'tensorflow'],)
+    env.docker.enabled = True
+    dockerfile = r"""
+    FROM mcr.microsoft.com/azureml/base:intelmpi2018.3-ubuntu16.04
+    RUN apt-get update && apt-get install -y libgl1-mesa-glx
+    RUN echo "Hello from custom container!"
+    """
+    env.docker.base_image = None
+    env.docker.base_dockerfile = dockerfile
+
+
+    cd = CondaDependencies.create(  pip_packages=[  'azureml-dataset-runtime[pandas,fuse]', 'azureml-defaults', 'azure-ml-api-sdk', 
+                                                    'opencv-python', 'onnxmltools', 'onnxruntime', 'tf2onnx'], 
+                                    conda_packages = ['scikit-learn==0.22.1', 'tensorflow']
+                                    )
     env.python.conda_dependencies = cd
 
     # Register environment to re-use later
@@ -51,12 +66,26 @@ def prepareEnv(ws, env_name):
 
 def prepareTraining(dataset, script_folder, compute_target, env):
     # get environment variables
-    reg_parameter = float(os.environ.get('REG_PARAMETER'))
-    train_Script_name = os.environ.get('TRAIN_SCRIPT_NAME')
+    parameter_name = os.environ.get('MODEL_NAME')
+    parameter_version = float(os.environ.get('MODEL_VERSION'))
+    parameter_epochs = int(os.environ.get('MODEL_EPOCHS'))
+    parameter_batchsize = int(os.environ.get('MODEL_BATCH_SIZE'))
+    parameter_dataset_name = os.environ.get('DATASET_NAME')
+
+    train_script_name = os.environ.get('TRAIN_SCRIPT_NAME')
 
     # define arguments and training script
-    args = ['--data-folder', dataset.as_mount(), '--regularization', reg_parameter]
-    src = ScriptRunConfig(source_directory=script_folder, script=train_Script_name, arguments=args,  compute_target=compute_target, environment=env)
+    args = ['--modelname', parameter_name,
+            '--modelversion', parameter_version,
+            '--epochs', parameter_epochs,
+            '--batchsize', parameter_batchsize,
+            '--dataset_name', parameter_dataset_name
+            ]
+    src = ScriptRunConfig(  source_directory=script_folder, 
+                            script=train_script_name, 
+                            arguments=args,  
+                            compute_target=compute_target, 
+                            environment=env)
 
     return src
 
@@ -75,12 +104,10 @@ def main():
     temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
 
     env_name = os.environ.get("AML_ENV_NAME")
-    #model_name = os.environ.get("MODEL_NAME")
     dataset_name = os.environ.get('DATASET_NAME')
 
     root_dir = os.environ.get('ROOT_DIR')
     script_folder = os.path.join(root_dir, 'scripts')
-    #config_state_folder = os.path.join(root_dir, 'config_states')
 
     # setup workspace + datastore
     ws = Workspace.get(
@@ -89,9 +116,9 @@ def main():
         resource_group=resource_group,
         auth=cli_auth
     )
-    print(dataset_name)
 
     # Prepare!
+    print(dataset_name)
     dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
     compute_target = prepareMachines(ws)
     env = prepareEnv(ws, env_name)
@@ -103,7 +130,8 @@ def main():
 
     run.wait_for_completion()
     run_details = {k:v for k,v in run.get_details().items() if k not in ['inputDatasets', 'outputDatasets']}
-    
+    print(run.get_metrics())
+    print(run.get_file_names())
     path_json = os.path.join(temp_state_directory, 'training_run.json')
     with open(path_json, 'w') as training_run_json:
         json.dump(run_details, training_run_json)

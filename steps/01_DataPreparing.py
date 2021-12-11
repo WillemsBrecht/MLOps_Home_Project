@@ -29,7 +29,7 @@ def uploadData(data_folder, ws, datastore): # download our data
     dataset_name = os.environ.get('DATASET_NAME') #name of dataset
     dataset_description = os.environ.get('DATASET_DESCRIPTION')  #desc of dataset
     dataset_new_version = os.environ.get('DATASET_NEW_VERSION') == 'true'
-    show_progress_dataprep = os.environ.get('DATASET_NEW_VERSION') == 'true'
+    show_progress_dataprep = os.environ.get('SHOW_PROGRESS_DATAPREP') == 'true'
 
     # upload dataset to workspace
     ds_target = DataPath(datastore, dataset_name)

@@ -1,0 +1,9 @@
+fastapi-utils
+onnxruntime
+opencv-python
+pandas
+numpy
+pillow
+matplotlib
+python-multipart
+aiofiles
