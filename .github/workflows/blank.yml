@@ -33,22 +33,22 @@ jobs:
       - name: 'Run data prep script'
         working-directory: steps
         run: |
-          python steps/01_DataPreparing.py
+          python 01_DataPreparing.py
           
       - name: 'Run Training script'
         working-directory: steps
         run: |
-          python steps/02_Training.py
+          python 02_Training.py
           
       - name: 'Register model'
         working-directory: steps
         run: |
-          python steps/03_RegisterModel.py
+          python 03_RegisterModel.py
           
       - name: 'Deploy model'
         working-directory: steps
         run: |
-          python steps/04_DeployModel.py
+          python 04_DeployModel.py
       
       - name: "Save config data"
         uses: actions/upload-artifact@v2.2.3
