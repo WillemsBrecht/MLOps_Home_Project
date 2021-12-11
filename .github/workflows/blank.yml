@@ -57,7 +57,7 @@ jobs:
           retention-days: 10
           
       - name: Debugging
-        working-directory: api/api
+        working-directory: api/api/app
         run: |
           mkdir images
           ls
