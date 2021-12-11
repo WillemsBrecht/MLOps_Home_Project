@@ -6,5 +6,5 @@ steps/.env
 .vscode
 __pycache__
 dist
-
+*.onnx
 **/*.env
