@@ -84,6 +84,9 @@ jobs:
     runs-on: self-hosted
     
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      
       - name: Update kubernetes deployments
         working-directory: charts
         run: |
