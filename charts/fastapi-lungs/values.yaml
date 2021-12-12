@@ -2,27 +2,33 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: mlopsproj-group-8-lungs
+name: fastapi-lungs
 replicaCount: 1
+namespace: mlops-group-8
+nodeName: carlier-alex
 
 image:
   repository: ghcr.io/willemsbrecht/lungsfastapi
   tag: latest
   pullPolicy: Always
 
-imagePullSecrets: [lungs-secrets]
-nameOverride: ""
-fullnameOverride: ""
-
 deployment:
-  type: ClusterIP
-  port: 80
-  workloadselector: apps.deployment-mlopsproj-group-8-lungs-fastapi
-
+  portName: 80tcp
+  serviceType: ClusterIP
+  protocol: TCP
+  containerPort: 80
 
 service:
+  name: fastapi-lungs-svc
+  portName: 80tcp-svc
   type: ClusterIP
   port: 80
+  targetPort: 80
+  protocol: TCP
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

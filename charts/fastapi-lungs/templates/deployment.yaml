@@ -1,31 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "example.fullname" . }}
+  name: {{ .Values.name }}
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-        workload.user.cattle.io/workloadselector: {{ .Values.deployment.workloadselector }}
+      workload.user.cattle.io/workloadselector: apps.deployment-mlops-group-8-fastapi-lungs
+      app: {{ .Values.name }}
   template:
     metadata:
       labels:
-        workload.user.cattle.io/workloadselector: {{ .Values.deployment.workloadselector }}
+        workload.user.cattle.io/workloadselector: apps.deployment-mlops-group-8-fastapi-lungs
+        app: {{ .Values.name }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Values.name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.deployment.port }}
-              protocol: TCP
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+          - containerPort: {{ .Values.deployment.containerPort }}
+            name: {{ .Values.deployment.portName }}
+            protocol: {{ .Values.deployment.protocol }}
+      nodeName: {{ .Values.nodeName }}
+      restartPolicy: Always
