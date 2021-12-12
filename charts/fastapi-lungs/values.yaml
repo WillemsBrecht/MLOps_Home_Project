@@ -6,7 +6,7 @@ namespace: mlopsproj-group-8-lungs
 replicaCount: 1
 
 image:
-  repository: ghcr.io/..
+  repository: ghcr.io/willemsbrecht/lungsfastapi
   tag: latest
   pullPolicy: Always
 
