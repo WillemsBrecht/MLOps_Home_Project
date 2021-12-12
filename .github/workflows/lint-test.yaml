@@ -1,10 +1,6 @@
 name: Lint and Test Charts
 
-on:
-  workflow_run:
-      workflows: ["Release Charts"]
-      types:
-        - completed
+on: pull_request
 
 jobs:
   lint-test:
