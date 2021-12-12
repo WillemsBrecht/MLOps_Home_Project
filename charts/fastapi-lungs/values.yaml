@@ -10,7 +10,7 @@ image:
   tag: latest
   pullPolicy: Always
 
-imagePullSecrets: [lungs-secrets]
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
