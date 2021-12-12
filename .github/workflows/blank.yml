@@ -77,5 +77,5 @@ jobs:
         working-directory: charts
         run: |
           ls
-          helm install helm-demo -n mlops-group-8 ./fastapi-lungs
+          helm upgrade --install fastapi-lungs -n mlops-group-8 ./fastapi-lungs
         
