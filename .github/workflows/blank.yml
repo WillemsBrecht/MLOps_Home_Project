@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  Train_and_register_AI_model:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
@@ -43,6 +43,14 @@ jobs:
         run: |
           python3  steps/03_RegisterModel.py
           
+  Build_Fast_API_image:
+    # needs will wait until the specified jobs has succeeded
+    needs: Train_and_register_AI_model
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+          
       - name: 'Deploy model'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
@@ -56,13 +64,11 @@ jobs:
           path: tmp
           retention-days: 10
           
-      - name: Debugging
+      - name: Create the needed directories for the fast-api image
         working-directory: api/api/app
         run: |
           mkdir images
-          ls
 
-      # Build and run Dockerfile
       - name: Set PAT secret
         run: |
           echo ${{ secrets.PAT }} | docker login ghcr.io --username WillemsBrecht --password-stdin
@@ -72,11 +78,15 @@ jobs:
         run: |
           docker build -t ghcr.io/willemsbrecht/lungsfastapi .
           docker push ghcr.io/willemsbrecht/lungsfastapi
-      
+          
+  Deploy_to_cluster:
+    needs: Build_Fast_API_image
+    runs-on: self-hosted
+    
+    steps:
       - name: Update kubernetes deployments
         working-directory: charts
         run: |
-          ls
           helm upgrade --install fastapi-lungs -n mlops-group-8 ./fastapi-lungs
           kubectl port-forward service/fastapi-lungs-svc 8701:80 -n mlops-group-8 &
         #probeer echo PODNAME
