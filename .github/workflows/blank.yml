@@ -77,4 +77,5 @@ jobs:
         working-directory: charts
         run: |
           ls
+          helm install helm-demo -n brecht-willems-test ./fastapi-lungs
         
