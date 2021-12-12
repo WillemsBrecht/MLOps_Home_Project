@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-namespace: mlopsproj-group-8-lungs
+namespace: mlops-group-8
 replicaCount: 1
 
 image:
@@ -13,12 +13,6 @@ image:
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
-
-deployment:
-  type: ClusterIP
-  port: 80
-  workloadselector: apps.deployment-mlopsproj-group-8-lungs-fastapi
-
 
 service:
   type: ClusterIP
