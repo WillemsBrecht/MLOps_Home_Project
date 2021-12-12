@@ -42,21 +42,25 @@ def main():
     # authentication
     cli_auth = AzureCliAuthentication()
 
+    # get environment variables
+    env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
+    env = json.loads(env)
+
     # get environment variables 
-    workspace_name = os.environ.get("WORKSPACE_NAME")
-    resource_group = os.environ.get("RESOURCE_GROUP")
-    subscription_id = os.environ.get("SUBSCRIPTION_ID")
+    workspace_name = env.get("WORKSPACE_NAME")
+    resource_group = env.get("RESOURCE_GROUP")
+    subscription_id = env.get("SUBSCRIPTION_ID")
 
-    experiment_name = os.environ.get("EXPERIMENT_NAME")
+    experiment_name = env.get("EXPERIMENT_NAME")
 
-    model_name = os.environ.get("MODEL_NAME")
-    model_extension = os.environ.get("MODEL_EXTENSION")
-    azure_path = os.environ.get("AZURE_OUTPUT")
-    download_path = os.environ.get("MODEL_FOLDER")
+    model_name = env.get("MODEL_NAME")
+    model_extension = env.get("MODEL_EXTENSION")
+    azure_path = env.get("AZURE_OUTPUT")
+    download_path = env.get("MODEL_FOLDER")
 
-    #environment = os.environ.get("AML_ENV_NAME")
-    #score_script_path = os.path.join(os.environ.get("ROOT_DIR"), 'scripts', 'score.py')
-    temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
+    #environment = env.get("AML_ENV_NAME")
+    #score_script_path = os.path.join(env.get("ROOT_DIR"), 'scripts', 'score.py')
+    temp_state_directory = env.get('TEMP_STATE_DIRECTORY')
 
     # setup workspace + datastore
     ws = Workspace.get(

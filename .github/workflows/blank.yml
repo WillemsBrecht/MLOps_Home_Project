@@ -7,8 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  #pull_request:
+  #  branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -25,12 +25,54 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: 'Run data prep script'
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          python3 steps/01_DataPreparing.py
+          
+      - name: 'Run Training script'
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+        run: |
+          python3  steps/02_Training.py
+          
+      - name: 'Register model'
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+        run: |
+          python3  steps/03_RegisterModel.py
+          
+      - name: 'Deploy model'
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+        run: |
+          python3 steps/04_DeployModel.py
+      
+      - name: "Save config data"
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: config-data
+          path: tmp
+          retention-days: 10
+          
+      - name: Debugging
+        working-directory: api/api/app
+        run: |
+          mkdir images
+          ls
+
+      # Build and run Dockerfile
+      - name: Set PAT secret
+        run: |
+          echo ${{ secrets.PAT }} | docker login ghcr.io --username WillemsBrecht --password-stdin
+
+      - name: Build Dockerfile and push to github
+        working-directory: api/api
+        run: |
+          docker build -t ghcr.io/willemsbrecht/lungsfastapi .
+          docker push ghcr.io/willemsbrecht/lungsfastapi
+
+
+
+

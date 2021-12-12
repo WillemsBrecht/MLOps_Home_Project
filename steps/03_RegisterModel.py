@@ -29,17 +29,21 @@ def main():
     # authentication
     cli_auth = AzureCliAuthentication()
 
-    # get environment variables 
-    workspace_name = os.environ.get("WORKSPACE_NAME")
-    resource_group = os.environ.get("RESOURCE_GROUP")
-    subscription_id = os.environ.get("SUBSCRIPTION_ID")
-    
-    model_name = os.environ.get("MODEL_NAME")
-    model_extension = os.environ.get("MODEL_EXTENSION")
-    model_description = os.environ.get("MODEL_DESCRIPTION")
-    experiment_name = os.environ.get("EXPERIMENT_NAME")
+    # get environment variables
+    env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
+    env = json.loads(env)
 
-    temp_state_directory = os.environ.get('TEMP_STATE_DIRECTORY')
+    # get environment variables 
+    workspace_name = env.get("WORKSPACE_NAME")
+    resource_group = env.get("RESOURCE_GROUP")
+    subscription_id = env.get("SUBSCRIPTION_ID")
+    
+    model_name = env.get("MODEL_NAME")
+    model_extension = env.get("MODEL_EXTENSION")
+    model_description = env.get("MODEL_DESCRIPTION")
+    experiment_name = env.get("EXPERIMENT_NAME")
+
+    temp_state_directory = env.get('TEMP_STATE_DIRECTORY')
 
     # setup workspace + datastore
     ws = Workspace.get(
