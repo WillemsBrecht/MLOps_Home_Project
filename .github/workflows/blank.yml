@@ -78,7 +78,9 @@ jobs:
         run: |
           ls
           helm upgrade --install fastapi-lungs -n mlops-group-8 ./fastapi-lungs
-          export POD_NAME=$(kubectl get pods --namespace mlops-group-8 -l "app.kubernetes.io/name=fastapi-lungs,app.kubernetes.io/instance=fastapi-lungs" -o jsonpath="{.items[***].metadata.name}")
-          kubectl port-forward $POD_NAME 8701:80 --namespace mlops-group-8
+          kubectl port-forward service/fastapi-lungs-svc 8701:80 -n mlops-group-8
+          
+        #export POD_NAME=$(kubectl get pods --namespace mlops-group-8 -l "app.kubernetes.io/name=fastapi-lungs,app.kubernetes.io/instance=fastapi-lungs" -o jsonpath="{.items[***].metadata.name}")
+        #kubectl port-forward $POD_NAME 8701:80 --namespace mlops-group-8
 
         
