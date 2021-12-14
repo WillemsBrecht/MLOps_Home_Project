@@ -79,6 +79,8 @@ def main():
     run = Run(experiment=exp, run_id=config['runId'])
 
     # download model to
+    print(config)
+    print(run)
     download_json = downloadModel(run, model_name, model_extension, azure_path, download_path)
     
     # save download details
