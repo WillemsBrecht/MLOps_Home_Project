@@ -82,10 +82,13 @@ jobs:
         run: |
           echo ${{ secrets.PAT }} | docker login ghcr.io --username WillemsBrecht --password-stdin
 
-      - name: Build Dockerfile and push to github
+      - name: Build Dockerfile
         working-directory: api/api
         run: |
           docker build -t ghcr.io/willemsbrecht/lungsfastapi .
+
+      - name: Push Dockerfile to github
+        run: |
           docker push ghcr.io/willemsbrecht/lungsfastapi
           
   Deploy_to_cluster:
@@ -105,7 +108,4 @@ jobs:
         working-directory: charts
         run: |
           kubectl port-forward service/fastapi-lungs-svc 8701:80 -n mlops-group-8 &
-        #probeer echo PODNAME
-        #export POD_NAME=$(kubectl get pods --namespace mlops-group-8 -l "app.kubernetes.io/name=fastapi-lungs,app.kubernetes.io/instance=fastapi-lungs" -o jsonpath="{.items[***].metadata.name}")
-        #kubectl port-forward $POD_NAME 8701:80 --namespace mlops-group-8
 
