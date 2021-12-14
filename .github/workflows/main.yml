@@ -52,17 +52,11 @@ jobs:
         run: |
           python3  steps/02_Training.py
           
-      - name: 'Register model'
+      - name: 'Register & download model'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
           python3  steps/03_RegisterModel.py
-          
-      - name: 'Deploy model'
-        env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
-        run: |
-          python3 steps/04_DownloadModel.py
       
       - name: "Save config data"
         uses: actions/upload-artifact@v2.2.3
