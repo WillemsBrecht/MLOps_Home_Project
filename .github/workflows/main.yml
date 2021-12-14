@@ -25,6 +25,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: 'Set up python'
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      
+      # can be omitted if already installed
+      #- name: "install requirements"
+      #  run: |
+      #    python -m pip install --upgrade pip
+      #    python -m pip install -r requirements.txt
+          
+      - name: "Azure login"  
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: 'Run data prep script'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
