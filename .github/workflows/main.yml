@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  Train_AI_&_Build_API:
+  Train_AI_and_Build_API:
     # The type of runner that the job will run on
     runs-on: self-hosted
 
@@ -100,7 +100,7 @@ jobs:
           docker push ghcr.io/willemsbrecht/lungsfastapi:${{ secrets.IMAGE_VERSION }}
           
   Deploy_to_cluster:
-    needs: Train_AI_&_Build_API
+    needs: Train_AI_and_Build_API
     runs-on: self-hosted
     
     steps:
