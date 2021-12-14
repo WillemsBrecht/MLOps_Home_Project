@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from azureml.core import Dataset, Datastore, Experiment, Run, Workspace
-from azureml.core.authentication import AzureCliAuthentication
+from azureml.core.authentication import AzureCliAuthentication, ServicePrincipalAuthentication
 from azureml.data.datapath import DataPath
 
 from dotenv import load_dotenv
@@ -42,12 +42,11 @@ def uploadData(env, data_folder, ws, datastore): # download our data
 
 def main():
     print('Executing main - 01_DataPreparing')
-    # authentication Microsoft Azure (login on VM)
-    cli_auth = AzureCliAuthentication()
-
     # get environment variables
     env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
     env = json.loads(env)
+
+    cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("TENANT_ID"), service_principal_id="CLIENT_ID", service_principal_password="CLIENT_SECRET")
 
     resource_group = env.get("RESOURCE_GROUP") # Azure Resource grouo
     subscription_id = env.get("SUBSCRIPTION_ID") # Azure Subscription ID
