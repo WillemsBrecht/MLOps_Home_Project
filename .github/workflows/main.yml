@@ -74,13 +74,13 @@ jobs:
           path: tmp
           retention-days: 10
           
-  Build_Fast_API_image:
+  #Build_Fast_API_image:
     # needs will wait until the specified jobs has succeeded
-    needs: Train_and_register_AI_model
-    runs-on: self-hosted
+  #  needs: Train_and_register_AI_model
+  #  runs-on: self-hosted
 
-    steps:
-      - uses: actions/checkout@v2
+  #  steps:
+  #    - uses: actions/checkout@v2
          
       - name: Create the needed directories for the fast-api image
         working-directory: api/api/app
@@ -117,5 +117,6 @@ jobs:
         working-directory: charts
         run: |
           kubectl port-forward service/fastapi-lungs-svc 8701:80 -n mlops-group-8 &
+          sleep 2
           curl localhost:8701
 
