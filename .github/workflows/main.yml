@@ -25,6 +25,11 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: "Azure login"  
+        uses: azure/login@v1
+        with: # Set Azure credentials secret as an input
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: 'Run data prep script'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
