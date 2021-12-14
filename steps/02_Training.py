@@ -18,7 +18,7 @@ from azureml.core import Run, Experiment, Workspace, Dataset, Datastore
 load_dotenv()
 
 
-def prepareMachines(env, ws):
+def prepareMachines(ws):
     # get environment variables
     ENV_MODEL = json.loads(os.environ.get("ENV_MODEL"))
     ENV_CLUSTER = json.loads(os.environ.get("ENV_CLUSTER"))
@@ -66,7 +66,7 @@ def prepareEnv(ws, env_name):
     return env
 
 
-def prepareTraining(env, dataset, script_folder, compute_target, environment):
+def prepareTraining(script_folder, compute_target, environment):
     # get environment variables
     ENV_MODEL = json.loads(os.environ.get("ENV_MODEL"))
     ENV_DATA = json.loads(os.environ.get("ENV_DATA"))
@@ -132,7 +132,7 @@ def main():
     dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
     compute_target = prepareMachines(ws)
     environment = prepareEnv(ws, env_name)
-    src = prepareTraining(dataset, script_folder, compute_target, environment)
+    src = prepareTraining(script_folder, compute_target, environment)
 
     ## Start training
     exp = Experiment(workspace=ws, name=experiment_name)
