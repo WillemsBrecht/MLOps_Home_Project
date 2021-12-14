@@ -9,7 +9,7 @@ nodeName: carlier-alex
 
 image:
   repository: ghcr.io/willemsbrecht/lungsfastapi
-  tag: latest
+  tag: '1.0.0'
   pullPolicy: Always
 
 deployment:
