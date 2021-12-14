@@ -46,7 +46,7 @@ def main():
     env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
     env = json.loads(env)
 
-    cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("AZURE_CREDENTIALS")["tenantId"], service_principal_id=env.get("AZURE_CREDENTIALS")["clientId"], service_principal_password=env.get("AZURE_CREDENTIALS")["clientSecret"])
+    cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("AZURE_CREDENTIALS")[3], service_principal_id=env.get("AZURE_CREDENTIALS")[0], service_principal_password=env.get("AZURE_CREDENTIALS")[1])
     #cli_auth = AzureCliAuthentication()
 
     resource_group = env.get("RESOURCE_GROUP") # Azure Resource grouo
