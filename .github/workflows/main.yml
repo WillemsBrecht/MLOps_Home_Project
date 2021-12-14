@@ -58,7 +58,7 @@ jobs:
         run: |
           python3  steps/02_Training.py
           
-      - name: 'Register & download model'
+      - name: 'Register model'
         env:
           ENV_AZURE : ${{ secrets.ENV_AZURE }}
           ENV_GENERAL : ${{ secrets.ENV_GENERAL }}
@@ -66,6 +66,15 @@ jobs:
           ENV_REGISTER : ${{ secrets.ENV_REGISTER }}
         run: |
           python3  steps/03_RegisterModel.py
+
+      - name: 'Download model'
+        env:
+          ENV_AZURE : ${{ secrets.ENV_AZURE }}
+          ENV_GENERAL : ${{ secrets.ENV_GENERAL }}
+          ENV_MODEL : ${{ secrets.ENV_MODEL }}
+          ENV_REGISTER : ${{ secrets.ENV_REGISTER }}
+        run: |
+          python3  steps/04_DownloadModel.py
       
       - name: "Save config data"
         uses: actions/upload-artifact@v2.2.3

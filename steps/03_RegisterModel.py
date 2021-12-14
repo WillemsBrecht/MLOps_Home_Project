@@ -18,23 +18,12 @@ def getConfiguration(details_file):
         sys.exit(0)
     return config
 
+
 def registerModel(model_name, model_extension, description, run):
     # register model for outputs
     model = run.register_model(model_name=model_name, model_path=f'outputs/{model_name}{model_extension}', tags={"runId": run.id}, description=description)
     print("Model registered: {} \nModel Description: {} \nModel Version: {}".format(model.name, model.description, model.version))
     return model
-
-def downloadModel(run, name_model='model.pt', model_extension='.pt', azure_path='outputs', download_path='modelDownloads'):
-    #create model folder
-    os.makedirs(f'./{download_path}', exist_ok=True) 
-
-    #download model from run history/outputs
-    m = f'{name_model}{model_extension}'
-    model_path_azure = f'{azure_path}/{m}'
-    model_path_local = f'./{download_path}/{m}'
-    run.download_file(name=model_path_azure, output_file_path=model_path_local)
-    print(f'Downloaded model {m} from {model_path_azure} on Azure to local {model_path_local}')
-    return model_path_azure, model_path_local
 
 
 def main():
@@ -60,9 +49,6 @@ def main():
     model_name = ENV_MODEL.get("MODEL_NAME")
     model_extension = ENV_MODEL.get("MODEL_EXTENSION")
     model_description = ENV_MODEL.get("MODEL_DESCRIPTION")
-
-    azure_path = ENV_REGISTER.get("AZURE_OUTPUT")
-    download_path = ENV_REGISTER.get("MODEL_FOLDER")
 
     # setup workspace
     ws = Workspace.get(
@@ -90,14 +76,6 @@ def main():
     with open(path_json, "w") as model_details:
         json.dump(model_json, model_details)
 
-    # download model for build
-    path_azure, path_local = downloadModel(run, model_name, model_extension, azure_path, download_path)
-    download_json = {'path_azure':path_azure, 'path_local':path_local}
-
-    # save download details
-    path_json = os.path.join(temp_state_directory, 'download_details.json')
-    with open(path_json, "w") as download_details:
-        json.dump(download_json, download_details)
 
     # Finish
     print('Executing main - 03_RegisterModel - SUCCES')
