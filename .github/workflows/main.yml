@@ -42,19 +42,28 @@ jobs:
 
       - name: 'Run data prep script'
         env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+          ENV_AZURE : ${{ toJson(secrets.ENV_AZURE) }}
+          ENV_GENERAL : ${{ toJson(secrets.ENV_GENERAL) }}
+          ENV_DATA : ${{ toJson(secrets.ENV_DATA) }}
         run: |
           python3 steps/01_DataPreparing.py
           
       - name: 'Run Training script'
         env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+          ENV_AZURE : ${{ toJson(secrets.ENV_AZURE) }}
+          ENV_GENERAL : ${{ toJson(secrets.ENV_GENERAL) }}
+          ENV_DATA : ${{ toJson(secrets.ENV_DATA) }}
+          ENV_MODEL : ${{ toJson(secrets.ENV_MODEL) }}
+          ENV_CLUSTER : ${{ toJson(secrets.ENV_CLUSTER) }}
         run: |
           python3  steps/02_Training.py
           
       - name: 'Register & download model'
         env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+          ENV_AZURE : ${{ toJson(secrets.ENV_AZURE) }}
+          ENV_GENERAL : ${{ toJson(secrets.ENV_GENERAL) }}
+          ENV_MODEL : ${{ toJson(secrets.ENV_MODEL) }}
+          ENV_REGISTER : ${{ toJson(secrets.ENV_REGISTER) }}
         run: |
           python3  steps/03_RegisterModel.py
       

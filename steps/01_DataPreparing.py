@@ -42,17 +42,20 @@ def uploadData(env, data_folder, ws, datastore): # download our data
 
 def main():
     print('Executing main - 01_DataPreparing')
+
+
     # get environment variables
-    env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
-    env = json.loads(env)
+    ENV_AZURE = json.loads(os.environ.get("ENV_AZURE"))
+    ENV_GENERAL = json.loads(os.environ.get("ENV_GENERAL"))
+    ENV_DATA = json.loads(os.environ.get("ENV_DATA"))
 
-    #cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("AZURE_CREDENTIALS")[3], service_principal_id=env.get("AZURE_CREDENTIALS")[0], service_principal_password=env.get("AZURE_CREDENTIALS")[1])
+    resource_group = ENV_AZURE.get("RESOURCE_GROUP") # Azure Resource grouo
+    subscription_id = ENV_AZURE.get("SUBSCRIPTION_ID") # Azure Subscription ID
+    workspace_name = ENV_AZURE.get("WORKSPACE_NAME") # ML Service Workspace of resource group
+    temp_state_directory = ENV_GENERAL.get('TEMP_STATE_DIRECTORY')
+
+    # azure authentication
     cli_auth = AzureCliAuthentication()
-
-    resource_group = env.get("RESOURCE_GROUP") # Azure Resource grouo
-    subscription_id = env.get("SUBSCRIPTION_ID") # Azure Subscription ID
-    workspace_name = env.get("WORKSPACE_NAME") # ML Service Workspace of resource group
-    temp_state_directory = env.get('TEMP_STATE_DIRECTORY')
 
     # setup workspace + datastore
     print(f'Connect to workspace {workspace_name}')
@@ -63,8 +66,8 @@ def main():
     datastore = Datastore(ws)
 
     # download workspace
-    data_folder = os.path.join(os.getcwd(), env.get('DATA_FOLDER'))
-    data_result = uploadData(env, data_folder, ws, datastore)
+    data_folder = os.path.join(os.getcwd(), ENV_DATA.get('DATA_FOLDER'))
+    data_result = uploadData(ENV_DATA, data_folder, ws, datastore)
 
     # create temporary directory
     os.makedirs(temp_state_directory, exist_ok=True)

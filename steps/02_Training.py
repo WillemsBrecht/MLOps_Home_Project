@@ -19,13 +19,15 @@ load_dotenv()
 
 
 def prepareMachines(env, ws):
-    ## If machine not yet ready, create !
-    # choose a name for your cluster
-    compute_name = env.get("AML_COMPUTE_CLUSTER_NAME")
-    compute_min_nodes = int(env.get("AML_COMPUTE_CLUSTER_MIN_NODES"))
-    compute_max_nodes = int(env.get("AML_COMPUTE_CLUSTER_MAX_NODES"))
-    vm_size = env.get("AML_COMPUTE_CLUSTER_SKU")
-    show_progress_training = env.get('SHOW_PROGRESS_TRAINING') == 'true'
+    # get environment variables
+    ENV_MODEL = json.loads(os.environ.get("ENV_MODEL"))
+    ENV_CLUSTER = json.loads(os.environ.get("ENV_CLUSTER"))
+
+    compute_name = ENV_CLUSTER.get("AML_COMPUTE_CLUSTER_NAME")
+    compute_min_nodes = int(ENV_CLUSTER.get("AML_COMPUTE_CLUSTER_MIN_NODES"))
+    compute_max_nodes = int(ENV_CLUSTER.get("AML_COMPUTE_CLUSTER_MAX_NODES"))
+    vm_size = ENV_CLUSTER.get("AML_COMPUTE_CLUSTER_SKU")
+    show_progress_training = ENV_MODEL.get('SHOW_PROGRESS_TRAINING') == 'true'
 
     print(f'show_progress_training={show_progress_training}')
     if compute_name in ws.compute_targets:
@@ -66,13 +68,16 @@ def prepareEnv(ws, env_name):
 
 def prepareTraining(env, dataset, script_folder, compute_target, environment):
     # get environment variables
-    parameter_name = env.get('MODEL_NAME')
-    parameter_version = float(env.get('MODEL_VERSION'))
-    parameter_epochs = int(env.get('MODEL_EPOCHS'))
-    parameter_batchsize = int(env.get('MODEL_BATCH_SIZE'))
-    parameter_dataset_name = env.get('DATASET_NAME')
+    ENV_MODEL = json.loads(os.environ.get("ENV_MODEL"))
+    ENV_DATA = json.loads(os.environ.get("ENV_DATA"))
 
-    train_script_name = env.get('TRAIN_SCRIPT_NAME')
+    train_script_name = ENV_MODEL.get('TRAIN_SCRIPT_NAME')
+    parameter_name = ENV_MODEL.get('MODEL_NAME')
+    parameter_version = float(ENV_MODEL.get('MODEL_VERSION'))
+    parameter_epochs = int(ENV_MODEL.get('MODEL_EPOCHS'))
+    parameter_batchsize = int(ENV_MODEL.get('MODEL_BATCH_SIZE'))
+    parameter_dataset_name = ENV_DATA.get('DATASET_NAME')
+
 
     # define arguments and training script
     args = ['--modelname', parameter_name,
@@ -94,24 +99,24 @@ def main():
     print('Executing main - 02_Training')
 
     # get environment variables
-    env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
-    env = json.loads(env)
-
-    #cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("TENANT_ID"), service_principal_id=env.get("CLIENT_ID"), service_principal_password=env.get("CLIENT_SECRET"))
-    cli_auth = AzureCliAuthentication()
+    ENV_AZURE = json.loads(os.environ.get("ENV_AZURE"))
+    ENV_GENERAL = json.loads(os.environ.get("ENV_GENERAL"))
+    ENV_DATA = json.loads(os.environ.get("ENV_DATA"))
     
-    # get environment variables 
-    workspace_name = env.get("WORKSPACE_NAME")
-    experiment_name = env.get("EXPERIMENT_NAME")
-    resource_group = env.get("RESOURCE_GROUP")
-    subscription_id = env.get("SUBSCRIPTION_ID")
-    temp_state_directory = env.get('TEMP_STATE_DIRECTORY')
+    resource_group = ENV_AZURE.get("RESOURCE_GROUP") # Azure Resource grouo
+    subscription_id = ENV_AZURE.get("SUBSCRIPTION_ID") # Azure Subscription ID
+    workspace_name = ENV_AZURE.get("WORKSPACE_NAME") # ML Service Workspace of resource group
 
-    env_name = env.get("AML_ENV_NAME")
-    dataset_name = env.get('DATASET_NAME')
+    temp_state_directory = ENV_GENERAL.get('TEMP_STATE_DIRECTORY')
+    experiment_name = ENV_GENERAL.get("EXPERIMENT_NAME")
+    env_name = ENV_GENERAL.get("AML_ENV_NAME")
+    root_dir = ENV_GENERAL.get('ROOT_DIR')
 
-    root_dir = env.get('ROOT_DIR')
+    dataset_name = ENV_DATA.get('DATASET_NAME')
     script_folder = os.path.join(root_dir, 'scripts')
+
+    # azure authentication
+    cli_auth = AzureCliAuthentication()
 
     # setup workspace + datastore
     print(f'Connect to workspace {workspace_name} for experiment {experiment_name}')
@@ -125,9 +130,9 @@ def main():
     # Prepare!
     print(dataset_name)
     dataset = Dataset.get_by_name(workspace=ws, name=dataset_name)
-    compute_target = prepareMachines(env, ws)
+    compute_target = prepareMachines(ws)
     environment = prepareEnv(ws, env_name)
-    src = prepareTraining(env, dataset, script_folder, compute_target, environment)
+    src = prepareTraining(dataset, script_folder, compute_target, environment)
 
     ## Start training
     exp = Experiment(workspace=ws, name=experiment_name)
