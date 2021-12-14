@@ -99,6 +99,7 @@ def main():
 
     #cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("TENANT_ID"), service_principal_id=env.get("CLIENT_ID"), service_principal_password=env.get("CLIENT_SECRET"))
     cli_auth = AzureCliAuthentication()
+    
     # get environment variables 
     workspace_name = env.get("WORKSPACE_NAME")
     experiment_name = env.get("EXPERIMENT_NAME")
