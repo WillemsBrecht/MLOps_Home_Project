@@ -117,5 +117,6 @@ jobs:
         working-directory: charts
         run: |
           kubectl port-forward service/fastapi-lungs-svc 8701:80 -n mlops-group-8 &
+          sleep 2
           curl localhost:8701
 
