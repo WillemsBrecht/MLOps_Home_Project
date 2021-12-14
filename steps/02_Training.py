@@ -10,7 +10,7 @@ from azureml.core import ScriptRunConfig
 from azureml.core.environment import Environment
 from azureml.core.compute import AmlCompute, ComputeTarget
 from azureml.core.conda_dependencies import CondaDependencies
-from azureml.core.authentication import AzureCliAuthentication
+from azureml.core.authentication import AzureCliAuthentication, ServicePrincipalAuthentication
 from azureml.core import Run, Experiment, Workspace, Dataset, Datastore
 
 
@@ -93,12 +93,11 @@ def prepareTraining(env, dataset, script_folder, compute_target, environment):
 def main():
     print('Executing main - 02_Training')
 
-    # authentication
-    cli_auth = AzureCliAuthentication()
-
     # get environment variables
     env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
     env = json.loads(env)
+
+    cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("TENANT_ID"), service_principal_id="CLIENT_ID", service_principal_password="CLIENT_SECRET")
 
     # get environment variables 
     workspace_name = env.get("WORKSPACE_NAME")
