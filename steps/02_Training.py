@@ -22,6 +22,7 @@ def prepareMachines(ws):
     # get environment variables
     ENV_MODEL = json.loads(os.environ.get("ENV_MODEL"))
     ENV_CLUSTER = json.loads(os.environ.get("ENV_CLUSTER"))
+    print(ENV_CLUSTER)
 
     compute_name = ENV_CLUSTER.get("AML_COMPUTE_CLUSTER_NAME")
     compute_min_nodes = int(ENV_CLUSTER.get("AML_COMPUTE_CLUSTER_MIN_NODES"))
