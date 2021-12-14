@@ -52,6 +52,19 @@ jobs:
         run: |
           python3  steps/02_Training.py
           
+      - name: 'Deploy model'
+        env:
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
+        run: |
+          python3 steps/04_DeployModel.py
+      
+      - name: "Save config data"
+        uses: actions/upload-artifact@v2.2.3
+        with:
+          name: config-data
+          path: tmp
+          retention-days: 10
+          
       - name: 'Register model'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
@@ -65,19 +78,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-          
-      - name: 'Deploy model'
-        env:
-          SECRETS_CONTEXT: ${{ toJson(secrets) }}
-        run: |
-          python3 steps/04_DeployModel.py
-      
-      - name: "Save config data"
-        uses: actions/upload-artifact@v2.2.3
-        with:
-          name: config-data
-          path: tmp
-          retention-days: 10
           
       - name: Create the needed directories for the fast-api image
         working-directory: api/api/app
