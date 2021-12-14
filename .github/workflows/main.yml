@@ -112,10 +112,14 @@ jobs:
         run: |
           helm upgrade --install fastapi-lungs -n mlops-group-8 ./fastapi-lungs
 
-      - name: Test port-forward fastapi connection
+      - name: Port-forward fastapi connection
         working-directory: charts
         run: |
           kubectl port-forward service/fastapi-lungs-svc 8701:80 -n mlops-group-8 &
-          sleep 2
+
+      - name: Test port-forward fastapi connection
+        working-directory: charts
+        run: |
+          sleep 5
           curl localhost:8701
 
