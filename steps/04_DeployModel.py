@@ -43,7 +43,7 @@ def main():
     env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
     env = json.loads(env)
 
-    cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("TENANT_ID"), service_principal_id="CLIENT_ID", service_principal_password="CLIENT_SECRET")
+    cli_auth = ServicePrincipalAuthentication(tenant_id=env.get("TENANT_ID"), service_principal_id=env.get("CLIENT_ID"), service_principal_password=env.get("CLIENT_SECRET"))
 
     # get environment variables 
     workspace_name = env.get("WORKSPACE_NAME")
