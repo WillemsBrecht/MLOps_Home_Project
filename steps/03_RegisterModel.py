@@ -41,25 +41,28 @@ def main():
     print('Executing main - 03_RegisterModel')
 
     # get environment variables
-    env = os.environ.get("SECRETS_CONTEXT") # Azure Resource grouo
-    env = json.loads(env)
+    ENV_AZURE = json.loads(os.environ.get("ENV_AZURE"))
+    ENV_GENERAL = json.loads(os.environ.get("ENV_GENERAL"))
+    ENV_MODEL = json.loads(os.environ.get("ENV_MODEL"))
+    ENV_REGISTER = json.loads(os.environ.get("ENV_REGISTER"))
 
     # azure authentication
     cli_auth = AzureCliAuthentication()
 
     # get environment variables 
-    workspace_name = env.get("WORKSPACE_NAME")
-    resource_group = env.get("RESOURCE_GROUP")
-    subscription_id = env.get("SUBSCRIPTION_ID")
-    
-    model_name = env.get("MODEL_NAME")
-    model_extension = env.get("MODEL_EXTENSION")
-    model_description = env.get("MODEL_DESCRIPTION")
-    experiment_name = env.get("EXPERIMENT_NAME")
+    resource_group = ENV_AZURE.get("RESOURCE_GROUP") # Azure Resource grouo
+    subscription_id = ENV_AZURE.get("SUBSCRIPTION_ID") # Azure Subscription ID
+    workspace_name = ENV_AZURE.get("WORKSPACE_NAME") # ML Service Workspace of resource group
 
-    azure_path = env.get("AZURE_OUTPUT")
-    download_path = env.get("MODEL_FOLDER")
-    temp_state_directory = env.get('TEMP_STATE_DIRECTORY')
+    temp_state_directory = ENV_GENERAL.get('TEMP_STATE_DIRECTORY')
+    experiment_name = ENV_GENERAL.get("EXPERIMENT_NAME")
+    
+    model_name = ENV_MODEL.get("MODEL_NAME")
+    model_extension = ENV_MODEL.get("MODEL_EXTENSION")
+    model_description = ENV_MODEL.get("MODEL_DESCRIPTION")
+
+    azure_path = ENV_REGISTER.get("AZURE_OUTPUT")
+    download_path = ENV_REGISTER.get("MODEL_FOLDER")
 
     # setup workspace
     ws = Workspace.get(

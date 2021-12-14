@@ -1,1 +1,0 @@
-print('STFU: https://www.youtube.com/watch?v=OLpeX4RRo28')
