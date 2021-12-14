@@ -86,6 +86,7 @@ jobs:
         working-directory: api/api/app
         run: |
           mkdir images
+          ls
 
       - name: Set PAT secret
         run: |
