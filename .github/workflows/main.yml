@@ -50,20 +50,20 @@ jobs:
           
       - name: 'Run Training script'
         env:
-          ENV_AZURE : ${{ toJson(secrets.ENV_AZURE) }}
-          ENV_GENERAL : ${{ toJson(secrets.ENV_GENERAL) }}
-          ENV_DATA : ${{ toJson(secrets.ENV_DATA) }}
-          ENV_MODEL : ${{ toJson(secrets.ENV_MODEL) }}
-          ENV_CLUSTER : ${{ toJson(secrets.ENV_CLUSTER) }}
+          ENV_AZURE : ${{ secrets.ENV_AZURE }}
+          ENV_GENERAL : ${{ secrets.ENV_GENERAL }}
+          ENV_DATA : ${{ secrets.ENV_DATA }}
+          ENV_MODEL : ${{ secrets.ENV_MODEL }}
+          ENV_CLUSTER : ${{ secrets.ENV_CLUSTER }}
         run: |
           python3  steps/02_Training.py
           
       - name: 'Register & download model'
         env:
-          ENV_AZURE : ${{ toJson(secrets.ENV_AZURE) }}
-          ENV_GENERAL : ${{ toJson(secrets.ENV_GENERAL) }}
-          ENV_MODEL : ${{ toJson(secrets.ENV_MODEL) }}
-          ENV_REGISTER : ${{ toJson(secrets.ENV_REGISTER) }}
+          ENV_AZURE : ${{ secrets.ENV_AZURE }}
+          ENV_GENERAL : ${{ secrets.ENV_GENERAL }}
+          ENV_MODEL : ${{ secrets.ENV_MODEL }}
+          ENV_REGISTER : ${{ secrets.ENV_REGISTER }}
         run: |
           python3  steps/03_RegisterModel.py
       

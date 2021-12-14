@@ -48,7 +48,6 @@ def main():
     ENV_AZURE = json.loads(os.environ.get("ENV_AZURE"))
     ENV_GENERAL = json.loads(os.environ.get("ENV_GENERAL"))
     ENV_DATA = json.loads(os.environ.get("ENV_DATA"))
-    print(ENV_AZURE)
 
     resource_group = ENV_AZURE.get("RESOURCE_GROUP") # Azure Resource grouo
     subscription_id = ENV_AZURE.get("SUBSCRIPTION_ID") # Azure Subscription ID
