@@ -58,14 +58,6 @@ jobs:
         run: |
           python3  steps/03_RegisterModel.py
           
-  Build_Fast_API_image:
-    # needs will wait until the specified jobs has succeeded
-    needs: Train_and_register_AI_model
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v2
-          
       - name: 'Deploy model'
         env:
           SECRETS_CONTEXT: ${{ toJson(secrets) }}
@@ -79,6 +71,14 @@ jobs:
           path: tmp
           retention-days: 10
           
+  Build_Fast_API_image:
+    # needs will wait until the specified jobs has succeeded
+    needs: Train_and_register_AI_model
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+         
       - name: Create the needed directories for the fast-api image
         working-directory: api/api/app
         run: |
