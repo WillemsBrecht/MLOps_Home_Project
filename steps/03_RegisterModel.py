@@ -92,7 +92,7 @@ def main():
 
     # download model for build
     path_azure, path_local = downloadModel(run, model_name, model_extension, azure_path, download_path)
-    download_json = {'path_azure':path_local, 'path_local':path_local}
+    download_json = {'path_azure':path_azure, 'path_local':path_local}
 
     # save download details
     path_json = os.path.join(temp_state_directory, 'download_details.json')
