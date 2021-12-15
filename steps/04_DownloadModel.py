@@ -48,12 +48,12 @@ def downloadModel(run, version):
     m_absolute = f'{d}_{model_name}_{version}{model_extension}'
     path_azure = f'{azure_path}/{m}'
     path_local = f'./{download_path}/{m}'
-    #path_absolute = f'{download_path_abs}/{m_absolute}'
+    path_absolute = f'{download_path_abs}/{m_absolute}'
     run.download_file(name=path_azure, output_file_path=path_local)
-    #path_absolute = shutil.copy(path_local, path_absolute)
+    path_absolute = shutil.copy(path_local, path_absolute)
 
-    print(f'Downloaded model {m} from {path_azure} on Azure to local {path_local}') # and absolute {path_absolute}')
-    return {'path_azure':path_azure, 'path_local':path_local} # 'path_absolute':path_absolute}
+    print(f'Downloaded model {m} from {path_azure} on Azure to local {path_local} and absolute {path_absolute}')
+    return {'path_azure':path_azure, 'path_local':path_local, 'path_absolute':path_absolute}
 
 def main():
     print('Executing main - 04_DeployModel')
