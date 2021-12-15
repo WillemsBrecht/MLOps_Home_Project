@@ -99,6 +99,12 @@ jobs:
           docker build -t ghcr.io/willemsbrecht/lungsfastapi:${{ secrets.IMAGE_VERSION }} .
           docker push ghcr.io/willemsbrecht/lungsfastapi:${{ secrets.IMAGE_VERSION }}
           
+      - name: Tag Dockerfile as latest & Push Dockerfile to github
+        working-directory: api/api
+        run: |
+          docker tag ghcr.io/willemsbrecht/lungsfastapi:${{ secrets.IMAGE_VERSION }} ghcr.io/willemsbrecht/lungsfastapi:latest
+          docker push ghcr.io/willemsbrecht/lungsfastapi:latest
+          
   Deploy_to_cluster:
     needs: Train_AI_and_Build_API
     runs-on: self-hosted
