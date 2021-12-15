@@ -93,7 +93,7 @@ def main():
     print(f'{config.keys()}\n')
     print(f'{model_details.keys()}\n')
     #print(run)
-    download_json = downloadModel(run, version=model_details['version'])
+    download_json = downloadModel(run, version=model_details.get('model').get('version'))
     
     # save download details
     path_json = os.path.join(temp_state_directory, 'download_details.json')
