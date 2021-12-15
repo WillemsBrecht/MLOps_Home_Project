@@ -1,12 +1,10 @@
 import cv2
 import numpy as np
-import pandas as pd
 from PIL import Image
 from io import BytesIO
 
 
 class Lung_image():
-
 
     def __init__(self, uploaded_image):
         # this class will take the input image, turn it to a npumpy array and resize it zo it is the right shape for the auto encoder model.
