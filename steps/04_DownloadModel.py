@@ -90,8 +90,8 @@ def main():
     # download model to
     path_json = os.path.join(temp_state_directory, 'model_details.json')
     model_details = getConfiguration(path_json)
-    print(f'{config}\n')
-    print(f'{model_details}\n')
+    print(f'{config.keys()}\n')
+    print(f'{model_details.keys()}\n')
     #print(run)
     download_json = downloadModel(run, version=model_details['version'])
     
