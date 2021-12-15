@@ -88,9 +88,12 @@ def main():
     run = Run(experiment=exp, run_id=config['runId'])
 
     # download model to
-    print(config)
-    print(run)
-    download_json = downloadModel(run, version=config['version'])
+    path_json = os.path.join(temp_state_directory, 'model_details.json')
+    model_details = getConfiguration(path_json)
+    print(f'{config}\n')
+    print(f'{model_details}\n')
+    #print(run)
+    download_json = downloadModel(run, version=model_details['version'])
     
     # save download details
     path_json = os.path.join(temp_state_directory, 'download_details.json')
