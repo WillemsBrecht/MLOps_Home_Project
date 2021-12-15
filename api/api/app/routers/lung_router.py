@@ -5,6 +5,7 @@ from classes.segmentation_image import *
 from fastapi import APIRouter, File
 from fastapi.responses import FileResponse
 
+
 router = APIRouter(
     prefix = "/lungs",
     tags = ["Lungs"],

@@ -3,15 +3,16 @@ from fastapi import FastAPI
 from routers import lung_router as lung
 from fastapi_utils.tasks import repeat_every
 
+# create fastapi
 app = FastAPI()
 app.include_router(lung.router)
 
-name_queue = list()
 
-
+# default route
 @app.get("/")
 async def root():
     return {"Message": "Welcome to our API, please visit /docs for the different routes/endpoints you can use."}
+
 
 # Checks on startup and every 10 minutes
 @app.on_event("startup")
