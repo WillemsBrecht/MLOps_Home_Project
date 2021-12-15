@@ -39,6 +39,7 @@ def uploadData(data_folder, ws, datastore): # download our data
 
 def main():
     print('Executing main - 01_DataPreparing')
+    # -----------------------------------------------------------------
     # get environment variables
     ENV_AZURE = json.loads(os.environ.get("ENV_AZURE"))
     ENV_GENERAL = json.loads(os.environ.get("ENV_GENERAL"))
@@ -64,7 +65,7 @@ def main():
     data_folder = os.path.join(os.getcwd(), ENV_DATA.get('DATA_FOLDER'))
     data_result = uploadData(data_folder, ws, datastore)
 
-    # create temporary directory & dump dictionnary into file dataset.json
+    # create temporary directory & dump step results into file json
     os.makedirs(temp_state_directory, exist_ok=True)
     # ---
     path_json = os.path.join(temp_state_directory, 'dataset.json')
