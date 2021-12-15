@@ -1,10 +1,10 @@
 apiVersion: v2
 appVersion: "1.0"
-description: Meaningful description
+description: A deployment to serve an API for lung segmentation
 home: https://helm.sh/helm
 maintainers:
-  - email: alex.carlier@student.howest.be
-    name: Carlier Alex
+  - email: alex.carlier@student.howest.be, brecht.willems2@student.howest.be, bram.langmans@student.howest.be
+    name: Carlier Alex, Willems Brecht, Langmans Bram
 name: fastapi-lungs
 sources:
   - https://github.com/helm/helm
