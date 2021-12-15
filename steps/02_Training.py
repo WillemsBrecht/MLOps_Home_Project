@@ -137,7 +137,7 @@ def main():
     run = exp.submit(config=src)
     run.wait_for_completion()
 
-    # dump step results into file json
+    # dump training details into file json
     run_details = {k:v for k,v in run.get_details().items() if k not in ['inputDatasets', 'outputDatasets']}
     #print(run.get_metrics())
     #print(run.get_file_names())

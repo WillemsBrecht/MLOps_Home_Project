@@ -65,7 +65,7 @@ def main():
     data_folder = os.path.join(os.getcwd(), ENV_DATA.get('DATA_FOLDER'))
     data_result = uploadData(data_folder, ws, datastore)
 
-    # create temporary directory & dump step results into file json
+    # create temporary directory & dump data details into file json
     os.makedirs(temp_state_directory, exist_ok=True)
     # ---
     path_json = os.path.join(temp_state_directory, 'dataset.json')
