@@ -19,6 +19,6 @@ async def root():
 @repeat_every(seconds=60*10)  # repeat every 10 minutes
 def delete_images_from_directory():
     # Checks if the image directory is empty or not
-    # if it's empty then delete all the files ( in this case images from the directory)
+    # if it's not empty then delete all the files ( in this case images from the directory)
     if len(os.listdir(".//images")) > 0:
         [os.remove(f".//images//{image}") for image in os.listdir(".//images")]
