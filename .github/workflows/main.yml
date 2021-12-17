@@ -50,7 +50,7 @@ jobs:
           ENV_MODEL : ${{ secrets.ENV_MODEL }}
           ENV_CLUSTER : ${{ secrets.ENV_CLUSTER }}
         run: |
-          python3  02_Training.py
+          python3 02_Training.py
           
 
       - name: 'Run step 03 - Model registration'
@@ -61,7 +61,7 @@ jobs:
           ENV_MODEL : ${{ secrets.ENV_MODEL }}
           ENV_REGISTER : ${{ secrets.ENV_REGISTER }}
         run: |
-          python3  03_RegisterModel.py
+          python3 03_RegisterModel.py
 
 
       - name: 'Run step 04 - Model dowload from Azure for API build'
@@ -72,7 +72,7 @@ jobs:
           ENV_MODEL : ${{ secrets.ENV_MODEL }}
           ENV_REGISTER : ${{ secrets.ENV_REGISTER }}
         run: |
-          python3  04_DownloadModel.py
+          python3 04_DownloadModel.py
       
 
       - name: "Save config data"
